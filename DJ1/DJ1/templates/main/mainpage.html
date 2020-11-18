@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+
+  </head>
+{% load task_filter %}
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Navbar</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url "mainpage:index" %}">Главная<span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url "mainpage:educators" %}">Преподаватели</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Pricing</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+    <div class="col-8">
+            <h1 class="my-5">Домашнее задание</h1>
+
+
+        <div id="accordion">
+
+
+        {% if subjects %}
+            {% for i in subjects %}
+  <div class="card">
+    <div class="card-header" id="heading{{i.id}}">
+      <h5 class="mb-0">
+        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{i.id}}" aria-expanded="false" aria-controls="collapse{{i.id}}">
+          {{ i.subject_name }}
+        </button>
+      </h5>
+    </div>
+
+    <div id="collapse{{i.id}}" class="collapse" aria-labelledby="heading{{i.id}}" data-parent="#accordion">
+      <div class="card-body">
+      <ul class="list-group mt-1">
+     {% if tasks %}
+
+    {% for t in tasks|filter_tasks:i.id %}
+
+      <li class="list-group-item">{{ t.task_text }} <em>Дедлайн: {{t.expire}}</em>
+      {% if t.isSoon %}
+          <b>Осторожно! Осталось менее трех дней!</b>
+          {% endif %}
+      </li>
+    {% endfor %}
+{% endif %}
+
+</ul>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% endif %}
+
+
+</div>
+
+
+    </div>
+    <div class="col-4">
+  <h1 class="display-5">Опубликовать дз</h1>
+    <form action="{% url 'mainpage:leave_task_ajax' %}" method="POST" class="form main-section-right-form">
+        {% csrf_token %}
+        <select class="form-control" name="subject" id="exampleFormControlSelect1">
+            {% if subjects %}
+            {% for i in subjects %}
+              <option value="{{i.subject_name}}">{{i.subject_name}}</option>
+            {% endfor %}
+            {% endif  %}
+    </select>
+        <p >Введите дз</p>
+        <input type="text" class="form-control mt-2" name="text" placeholder="Введите дз" required>
+        <p >Выберите дедлайн</p>
+        <input type="date" name="expire" class="form-control mt-2" placeholder="Выберите дедлайн" required>
+        <button type="submit" class="btn btn-danger mt-5">Отправить</button>
+    </form>
+
+    </div>
+</div>
+</div>
+
+<script src="{% static 'jquery-3.5.1.min.js' %}"></script>
+<script src="{% static 'bootstrap.min.js' %}"></script>
+<script src="{% static 'notify.min.js' %}"></script>
+<script src="{%  static 'script.js' %}"></script>
+</body>
+</html>
